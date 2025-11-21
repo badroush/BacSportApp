@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{% endblock %}
+{% block body %}
+	{% if app.user %}
+		<div class="container">
+			<div
+				class="main-body">
+				<!-- /Breadcrumb -->
+				<div class="row gutters-sm">
+				<div class="col-md-4 mb-3">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex flex-column align-items-center text-center">
+									<img src="{{ asset('uploads/photoprofile/' ~ app.user.photo) }}" alt="Admin" class="rounded-circle" width="150">
+									<div class="mt-3">
+										<h4>{{ app.user.user }}</h4>
+										<p class="text-muted font-size-sm">{{ app.user.email }}</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-8">
+						<div class="card mb-3">
+							<div class="card-body">
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">الإسم و اللقب</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.user }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">نوع المستخدم</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{% set role = app.user.roles[0] %}
+										{% if role == 'ROLE_ADMIN' %}
+											مدير
+										{% elseif role == 'ROLE_USER' %}
+											مسؤول
+										{% else %}
+											مستخدم عادي
+										{% endif %}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">المعهد</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.etablissement }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">البريد الإلكتروني</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.email }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">رقم الهاتف</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.mobile }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">تاريخ التسجيل</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.createdAt|date('Y-m-d H:i:s') }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">آخر تسجيل دخول</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ app.user.lastLogin ? app.user.lastLogin|date('Y-m-d H:i:s') : 'Jamais connecté' }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+									<div class="col-sm-12">
+										<a class="btn btn-info " href="{{ path('edit_profile') }}">تعديل المعطيات</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+
+				</div>
+
+			</div>
+		</div>
+	{% else %}
+		<div class="container">
+			<div class="alert alert-danger" role="alert">
+				You must be logged in to view this page.
+			</div>
+			<script>
+				window.location.href = "{{ path('app_login') }}";
+			</script>
+		</div>
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,818 @@
+{% extends 'base.html.twig' %}
+{% block title %}Ajout de note
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.note-page .container {
+			display: flex;
+			gap: 40px;
+			padding: 30px;
+			background: #f9f9f9;
+			border-radius: 12px;
+			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+		}
+
+		.note-page .left-panel,
+		.note-page .right-panel {
+			flex: 1;
+			background-color: #fff;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+		}
+
+		.note-page h2,
+		.note-page h3 {
+			color: #2c3e50;
+			border-bottom: 1px solid #ccc;
+			padding-bottom: 10px;
+			margin-bottom: 20px;
+		}
+
+		.note-page label {
+			display: block;
+			margin-top: 15px;
+			font-weight: bold;
+			color: #34495e;
+		}
+
+		.note-page input,
+		.note-page select {
+			width: 100%;
+			padding: 8px 10px;
+			margin-top: 5px;
+			border: 1px solid #ccc;
+			border-radius: 6px;
+		}
+
+		.note-page button {
+			margin-top: 20px;
+			background-color: #3498db;
+			color: #fff;
+			border: none;
+			padding: 10px 16px;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: background 0.3s;
+		}
+
+		.note-page button:hover {
+			background-color: #2980b9;
+		}
+
+		#operations-list {
+			list-style: none;
+			padding-left: 0;
+		}
+
+		#operations-list li {
+			padding: 6px 0;
+			border-bottom: 1px solid #eee;
+		}
+
+		.flash.success {
+			background-color: #d4edda;
+			color: #155724;
+			padding: 10px;
+			border-radius: 5px;
+			margin-bottom: 1em;
+		}
+
+		.flash.error {
+			background-color: #f8d7da;
+			color: #721c24;
+			padding: 10px;
+			border-radius: 5px;
+			margin-bottom: 1em;
+		}
+		.styled-operations {
+			width: 100%;
+			border-collapse: collapse;
+			margin-top: 15px;
+			font-family: 'Cairo', sans-serif;
+			direction: rtl;
+			background: rgba(255, 255, 255, 0.8);
+		}
+
+		.styled-operations th,
+		.styled-operations td {
+			border: 1px solid #ccc;
+			padding: 10px;
+			text-align: center;
+			font-weight: bold;
+		}
+
+		.styled-operations th {
+			background-color: #FFD700;
+			color: #000;
+		}
+
+		.styled-operations td:nth-child(3) {
+			background-color: #f9f;
+			color: #fff;
+			font-weight: bold;
+		}
+
+		.styled-operations tr:nth-child(even) {
+			background-color: #f3f3f3;
+		}
+
+		.styled-operations td,
+		.styled-operations th {
+			padding: 2px 4px !important;
+			line-height: 1 !important;
+			font-size: 22px;
+			height: 1px !important;
+			vertical-align: middle !important;
+			border-collapse: collapse;
+		}
+		.styled-operations tr {
+			height: 1px !important;
+		}
+		.styled-operations .delete-btn {
+			font-size: 20px;
+			line-height: 1;
+			padding: 0;
+			margin: 0;
+			background: none;
+
+		}
+		input,
+		select {
+			transition: all 0.3s ease;
+		}
+		#noteForm {
+			background-color: #ecf5fb;
+			padding: 30px;
+			border-radius: 12px;
+			max-width: 600px;
+			margin: auto;
+			box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+		}
+
+		.input-wrapper {
+			position: relative;
+			margin-bottom: 25px;
+		}
+
+		.input-wrapper i {
+			position: absolute;
+			right: 15px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #2980b9;
+			font-size: 1.2em;
+		}
+
+		#noteForm input,
+		#noteForm select,
+		#noteForm button {
+			font-size: 2em;
+			padding: 15px 50px 15px 15px;
+			width: 100%;
+			border: 2px solid #2980b9;
+			border-radius: 10px;
+			color: #2980b9;
+			text-align: right;
+			direction: rtl;
+			font-weight: bold;
+			box-sizing: border-box;
+			background-color: white;
+		}
+
+		#noteForm button {
+			background-color: #2980b9;
+			color: white;
+			font-weight: bold;
+			transition: background-color 0.3s ease;
+			cursor: pointer;
+		}
+
+		#noteForm button:hover {
+			background-color: #1f5e8c;
+		}
+
+		/* Supprimer les labels */
+		#noteForm label {
+			display: none;
+		}
+
+		.styled-operations {
+			border-collapse: separate;
+			border-spacing: 0 10px;
+			font-size: 1.4em;
+			width: 100%;
+			margin-top: 20px;
+			direction: rtl;
+			color: #2c3e50;
+		}
+
+		.styled-operations thead th {
+			background-color: #3498db;
+			color: white;
+			padding: 12px;
+			border-radius: 8px;
+			text-align: center;
+		}
+
+		.styled-operations tbody tr {
+			background-color: #ecf5fb;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			border-radius: 12px;
+			overflow: hidden;
+		}
+
+		.styled-operations tbody td {
+			padding: 15px;
+			text-align: center;
+			background-color: white;
+			border-radius: 10px;
+			margin: 5px;
+			box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+			font-weight: bold;
+			color: #2d3436;
+		}
+
+		/* Ligne Total et Moyenne */
+		.styled-operations tbody tr:last-child td,
+		.styled-operations tbody tr:nth-last-child(2) td {
+			background-color: #dfe6e9 !important;
+			color: #2d3436;
+			font-weight: bold;
+		}
+		.delete-btn:hover {
+			transform: scale(1.2);
+			color: #c0392b;
+		}
+
+		#eleve-details {
+			background-color: #ecf5fb;
+			padding: 20px;
+			margin-top: 20px;
+			border-radius: 15px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+			font-size: 1.3em;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			direction: rtl;
+			color: #2c3e50;
+		}
+
+		#eleve-details p {
+			margin: 10px 0;
+			background-color: white;
+			padding: 10px 15px;
+			border-radius: 10px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-weight: bold;
+		}
+
+		#eleve-details span {
+			color: #3498db;
+			font-weight: bold;
+			font-size: 1.1em;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div id="flash-message"></div>
+	
+	<div class="note-page">
+		<div
+			class="container">
+			<!-- Zone gauche : Infos élève + opérations -->
+			<div class="left-panel">
+				<h3>معطيات التلميذ</h3>
+				<div id="dispense-info" class="mt-2"></div>
+				<div
+					id="eleve-details">
+					<!-- Tu rempliras dynamiquement avec JS ou serveur -->
+					<p>
+						المعرف :<span id="cin-eleve" style="color: #3498db; direction: rtl; font-weight: bold">
+							<strong>-</strong>
+						</span>
+
+					</p>
+					<p>
+						رقم ب.ت.و :<span id="matricule-eleve" style="color: #3498db; direction: rtl; font-weight: bold">
+							<strong>-</strong>
+						</span>
+
+					</p>
+					<p style="direction: rtl; font-weight: bold">
+						الإسم و اللقب  :<span id="nom-eleve" style="color: #3498db; direction: rtl">
+							<strong>-</strong>
+						</span>
+					</p>
+					<p>
+						الجنس  :<span id="sexe-eleve" style="color: #3498db; direction: rtl; font-weight: bold">
+							<strong>-</strong>
+						</span>
+					</p>
+					<p>
+						القسم  :<span id="classe-eleve" style="color: #3498db; direction: rtl; font-weight: bold">
+							<strong>-</strong>
+						</span>
+					</p>
+					<p>
+						المعهد  :<span id="lycee-eleve" style="color: #3498db; direction: rtl; font-weight: bold">
+							<strong>-</strong>
+						</span>
+					</p>
+				</div>
+
+				<h3>الإختبارات المنجزة</h3>
+				<div id="operations-container" style="direction: rtl; align-items: center;"></div>
+			</div>
+
+			<!-- Zone droite : formulaire -->
+			<div class="right-panel">
+				<h2>إضافة نتيجة</h2>
+				<form id="noteForm">
+					<div class="input-wrapper">
+						<i class="fa-solid fa-id-card"></i>
+						<input type="text" id="cin" name="cin" required placeholder="المعرف">
+					</div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-list-check"></i>
+						<select id="epreuve" name="epreuve" required>
+							<option value="">الإختبار</option>
+						</select>
+					</div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-chart-line"></i>
+						<input type="number" direction="rtl" step="0.01" id="resultat" name="resultat" maxlength="5" placeholder="00.00" required>
+					</div>
+					<div class="input-wrapper">
+						<i class="fa-solid fa-clipboard-check"></i>
+						<input type="text" id="note" name="note" readonly placeholder="العدد المسند">
+					</div>
+					<div id="info-message"></div>
+					<button type="submit" id="btnsubm">تسجيل
+						<div id="loader" style="display:none; margin-top: 5px;">
+							<img src="{{ asset('build/img/loader.gif') }}" alt="Chargement..." style="height: 50px;">
+						</div>
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<script>
+document.addEventListener("DOMContentLoaded", function () {
+const container = document.getElementById('operations-container');
+const cinInput = document.getElementById('cin');
+const select = document.getElementById('epreuve');
+const btnsubm = document.getElementById('btnsubm');
+const noteInput = document.getElementById('note');
+const resultatInput = document.getElementById('resultat');
+const flash = document.getElementById('flash-message');
+const dispenseInfo = document.getElementById('dispense-info'); // élément pour afficher "هذا التلميذ معفى"
+console.log('Page chargée, initialisation des éléments...');
+let debounceTimer;
+
+cinInput.addEventListener('keyup', function () {
+clearTimeout(debounceTimer);
+
+debounceTimer = setTimeout(() => {
+const cin = cinInput.value.trim();
+
+if (cin.length < 4) {
+resetFormFields();
+return;
+}
+
+fetch('/get-epreuves/' + cin).then(res => res.json()).then(data => {
+select.innerHTML = '';
+console.log(data);
+if (data.length === 0) {
+showSwalMessage(" هذا التلميذ غير موجود  ✅");
+setFieldErrorStyles();
+return;
+}
+
+const ep0 = data[0];
+document.getElementById('cin-eleve').textContent = ep0.cin ?? 'غير متوفر';
+document.getElementById('matricule-eleve').textContent = ep0.matricule ?? 'غير متوفر';
+document.getElementById('nom-eleve').textContent = ep0.nomeleve ?? 'غير متوفر';
+document.getElementById('classe-eleve').textContent = ep0.classe ?? 'غير متوفر';
+document.getElementById('lycee-eleve').textContent = ep0.lycee ?? 'غير متوفر';
+document.getElementById('sexe-eleve').textContent = ep0.sexe === 'h' ? 'ذكر' : ep0.sexe === 'f' ? 'أنثى' : 'غير محدد';
+
+if (ep0.toutesEpreuvesPassees === true) {
+const option = document.createElement('option');
+option.value = '';
+option.textContent = 'لا توجد إختبارات';
+select.appendChild(option);
+setFieldErrorStyles();
+if(ep0.disp==true){
+	checkDispenseStatus(ep0.cin);
+}else{
+showSwalMessage(" هذا التلميذ لا يملك إختبارات  ✅");
+}
+return;
+}else if (ep0.toutesEpreuvesPassees === false) {
+	operationdteails(cin, container)
+}
+
+data.forEach(ep => {
+const option = document.createElement('option');
+option.value = ep.id;
+option.textContent = ep.nom;
+select.appendChild(option);
+});
+
+setFieldSuccessStyles();
+
+// 🔍 Vérifier s'il est dispensé
+function checkDispenseStatus(cin) {
+    fetch('/api/eleve-dispense/' + cin)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'dispense') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'إعفاء',
+                    text: 'هذا التلميذ معفى .',
+                    confirmButtonText: 'موافق'
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Erreur lors de la vérification du statut dispense", err);
+        });
+}
+
+}).catch(() => {
+resetFormFields();
+});
+
+}, 400);
+});
+
+function resetFormFields() {
+select.innerHTML = '';
+select.disabled = true;
+noteInput.disabled = true;
+resultatInput.disabled = true;
+btnsubm.disabled = true;
+noteInput.value = '';
+resultatInput.value = '';
+if (flash) 
+flash.innerHTML = '';
+
+if (dispenseInfo) 
+dispenseInfo.innerHTML = '';
+[
+'cin-eleve',
+'matricule-eleve',
+'nom-eleve',
+'sexe-eleve',
+'classe-eleve',
+'lycee-eleve'
+].forEach(id => {
+const el = document.getElementById(id);
+if (el) 
+el.textContent = '';
+
+});
+}
+
+function setFieldErrorStyles() {
+[select, noteInput, resultatInput].forEach(el => {
+el.disabled = true;
+el.value = '';
+el.style.border = '2px solid red';
+el.style.backgroundColor = '#ffe6e6';
+});
+btnsubm.disabled = true;
+}
+
+function setFieldSuccessStyles() {
+[noteInput, resultatInput, select].forEach(el => {
+el.disabled = false;
+el.style.border = '2px solid green';
+el.style.backgroundColor = '#eaffea';
+});
+btnsubm.disabled = false;
+}
+
+function showSwalMessage(text) {
+Swal.fire({
+icon: 'info',
+title: 'معلومة',
+text: text,
+confirmButtonText: 'موافق',
+background: '#fefefe',
+confirmButtonColor: '#3498db',
+customClass: {
+popup: 'swal2-rounded'
+}
+});
+}
+});
+		</script>
+		<script>
+		function operationdteails(cin, container) {
+		fetch('/api/operations/' + cin).then(res => res.json()).then(data => {
+		if (data.status === 'ok' && Array.isArray(data.operations) && data.operations.length > 0) {
+		if (data.operations.length === 3) { // Désactiver les champs si 3 opérations déjà enregistrées
+		document.getElementById('note').disabled = true;
+		document.getElementById('resultat').disabled = true;
+		document.getElementById('epreuve').disabled = true;
+		document.getElementById('btnsubm').disabled = true;
+		document.getElementById('note').value = '';
+		document.getElementById('resultat').value = '';
+		}
+		
+		let totalNote = 0;
+		let totalEpreuves = data.operations.length;
+		let table = `
+		<table class="styled-operations w-100">
+			<thead>
+				<tr>
+					<th>الإختبار</th>
+					<th>النتيجة</th>
+					<th>العدد المسند</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				`;
+				
+				data.operations.forEach(op => {
+				const note = parseFloat(op.note) || 0;
+				totalNote += note;
+				
+				table += `
+				<tr>
+					<td>${
+						op.epreuve
+						}</td>
+					<td>${
+						parseFloat(op.resultat).toFixed(2)
+						}</td>
+					<td>${
+						note.toFixed(2)
+						}</td>
+					<td>
+						<button class="delete-btn btn-danger" data-id="${
+							op.id
+							}">🗑️</button>
+					</td>
+				</tr>
+				`;
+				});
+				
+				// Total et moyenne
+				table += `
+				<tr style="background-color: #ffeaa7; font-weight: bold;">
+					<td colspan="2">المجموع</td>
+					<td>${
+						totalNote.toFixed(2)
+						}</td>
+					<td></td>
+				</tr>
+				<tr style="background-color: #81ecec; font-weight: bold;">
+					<td colspan="2">المعدل</td>
+					<td>${
+						(totalNote / totalEpreuves).toFixed(2)
+						}</td>
+					<td></td>
+				</tr>
+				`;
+				table += '</tbody></table>';
+		container.innerHTML = table;
+		} else if (data.status === 'ok' && data.operations.length === 0) { // CIN valide mais aucune opération trouvée
+		container.innerHTML = '<p style="color:red">لا توجد إختبارات مسجلة لهذا التلميذ</p>'; // Rien afficher
+		}else if (data.status === 'error') {
+		
+		} else {
+		container.innerHTML = '<p style="color:red">خطأ في البيانات: لا توجد إختبارات مسجلة لهذا التلميذ</p>';
+		}
+		}).catch(() => {
+		container.innerHTML = '<p style="color:red">خطأ في الاتصال بالسيرفر</p>';
+			});
+			}
+			
+			document.getElementById('cin').addEventListener('change', function () {
+			const cin = this.value.trim();
+			const container = document.getElementById('operations-container');
+			container.innerHTML = ''; // Toujours vider au début
+			
+			if (cin.length < 4) { // CIN trop court
+			return; // Ne rien faire
+			}operationdteails(cin, container);
+			
+			});
+			
+			document.getElementById('cin').addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') {
+			e.preventDefault(); // Empêche le comportement par défaut
+			
+			}
+			});
+			document.getElementById('noteForm').addEventListener('submit', function (e) {
+			e.preventDefault();
+			const payload = {
+			cin: document.getElementById('cin').value,
+			epreuve: document.getElementById('epreuve').value,
+			resultat: document.getElementById('resultat').value,
+			note: document.getElementById('note').value
+			};
+			// console.log(epreuve);
+			fetch('/submit-note', {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(payload)
+			}).then(res => res.json()).then(data => {
+			if (data.flash) {
+			showFlash(data.flash.type, data.flash.message);
+			}
+			if (data.status === 'ok') { // document.getElementById('noteForm').reset();
+			cin = document.getElementById('cin').value.trim();
+			const container = document.getElementById('operations-container');
+			operationdteails(cin, container);
+			}
+			}).catch(err => {
+			showFlash('خطأ', 'خطاء في الاتصال.');
+			document.getElementById('epreuve').focus();
+			});
+			});
+			document.querySelectorAll('#noteForm input, #noteForm select').forEach((el, index, elements) => {
+			el.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') {
+			e.preventDefault(); // Empêche la soumission du formulaire
+			
+			const next = elements[index + 1];
+			if (next) {
+			next.focus();
+			} else { // Si c'est le dernier champ, tu peux déclencher un clic sur le bouton si tu veux
+			document.getElementById('btnsubm').click();
+			}
+			}
+			});
+			});
+			document.getElementById('resultat').addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') {
+			e.preventDefault(); // Empêche le comportement par défaut
+			const note = document.getElementById('note').value.trim();
+			console.log(note);
+			if (note !== '') {
+			document.getElementById('btnsubm').click(); // Simule un clic sur le bouton d'envoi
+			document.getElementById('note').value = ''; // Efface la note();
+			document.getElementById('resultat').value = '';
+			// focus avec selection sur cin
+			document.getElementById('cin').select();
+			document.getElementById('cin').focus();
+			} else {
+			document.getElementById('resultat').focus();
+			document.getElementById('resultat').select();
+			}
+			}
+			});
+			function showFlash(type, message) {
+			Swal.fire({
+			icon: type === 'success' ? 'success' : type === 'error' ? 'error' : 'info',
+			title: type.charAt(0).toUpperCase() + type.slice(1),
+			text: message,
+			confirmButtonText: 'OK'
+			});
+			}
+			
+			document.addEventListener('click', function (e) {
+			if (e.target.classList.contains('delete-btn')) {
+			e.preventDefault();
+			const operationId = e.target.dataset.id;
+			Swal.fire({
+			title: 'تأكيد الحذف',
+			text: 'هل تريد حقا حذف هذا الإختبار ?',
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonText: 'نعم, إحذف',
+			cancelButtonText: 'إلغاء'
+			}).then((result) => {
+			if (result.isConfirmed) {
+			fetch (`/delete-operation/${operationId}`, {
+			method: 'DELETE',
+			headers: {
+			'X-Requested-With': 'XMLHttpRequest'
+			}
+			}).then(res => res.json()).then(data => {
+			if (data.status === 'ok') {
+			Swal.fire('حذف!', 'لقد تم حذف الأختبار بنجاح.', 'نجاح عملية الحذف');
+			e.target.closest('tr').remove(); // retire la ligne du tableau
+			} else {
+			Swal.fire('هناك خطاء', data.message || 'خطاء في عملية الحذف.', 'خطاء');
+			}
+			});
+			}
+			});
+			}
+			});
+	</script>
+	<script>
+		document.getElementById('cin').addEventListener('input', function (e) {
+let value = this.value.replace(/\D/g, ''); // Supprimer tout sauf les chiffres
+if (value.length >= 4) {
+value = value.slice(0, 4); // Limiter à 4 chiffres
+value = value.slice(0, 2) + '' + value.slice(2);
+}
+this.value = value;
+});
+	</script>
+	<script>
+		/* --------------------------------------------------
+Helpers
+-------------------------------------------------- */
+const $ = sel => document.querySelector(sel);
+const setBtn = (disabled) => {
+btnSubm.disabled = disabled;
+btnSubm.style.opacity = disabled ? .5 : 1;
+btnSubm.style.cursor = disabled ? 'not-allowed' : 'pointer';
+};
+
+/* --------------------------------------------------
+DOM éléments
+-------------------------------------------------- */
+const inputResultat = $('#resultat');
+const selectEpreuve = $('#epreuve');
+const inputCin = $('#cin');
+const noteField = $('#note');
+const loader = $('#loader');
+const infoMessage = $('#info-message');
+const btnSubm = $('#btnsubm');
+
+/* --------------------------------------------------
+Écouteur principal
+-------------------------------------------------- */
+inputResultat.addEventListener('input', async () => { /* valeurs courantes */
+const resultat = inputResultat.value.trim();
+const epreuveId = selectEpreuve.value;
+const cin = inputCin.value.trim();
+
+// Réinitialise l’affichage
+infoMessage.textContent = '';
+noteField.value = '';
+noteField.style.backgroundColor = '';
+loader.style.display = 'none';
+setBtn(true);
+// disable submit
+
+/* Validation rapide */
+if (! resultat || isNaN(resultat) || ! epreuveId || ! cin) 
+return;
+
+
+
+/* Affiche le loader et désactive le bouton */
+loader.style.display = 'inline-block';
+
+try {
+const url = `/get-note?cin=${cin}&epreuve=${epreuveId}&resultat=${resultat}`;
+const data = await(await fetch(url)).json();
+
+/* Cas particulier : épreuve 12 -> note = résultat brut */
+if (epreuveId === '12') {
+noteField.value = resultat;
+setBtn(false); // enable submit
+return;
+}
+
+/* Épreuve classique : note calculée ou suggestions */
+if (data.note !== null) {
+noteField.value = data.note;
+noteField.style.backgroundColor = '#eaffea';
+setBtn(false);
+// btnSubm.click(); // auto-submit
+} else {
+noteField.style.backgroundColor = '#f99999';
+noteField.value = '';
+noteField.disabled = true; // disable note input
+infoMessage.innerHTML = `<span style="color:#d00;font-weight:bold;font-size:18px;background:#ff0;padding:2px 6px">
+				حاول ${
+data.choixInf
+} أو ${
+data.choixSup
+}
+			</span>`;
+setBtn(true);
+}
+
+} catch (err) {
+console.error('Erreur get-note :', err);
+Swal.fire({icon: 'error', title: 'خطأ', text: 'حدث خطأ أثناء حساب العدد.', confirmButtonText: 'موافق'});
+noteField.value = 'Erreur';
+} finally {
+loader.style.display = 'none';
+}
+});
+	</script>
+</body>{% endblock %}

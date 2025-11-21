@@ -1,0 +1,125 @@
+/* Conteneur fluide et responsive */
+.table-container {
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Style de base pour la table */
+#elevetable {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', sans-serif;
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* En-têtes */
+#elevetable thead tr {
+    background-color: #1976d2;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+}
+
+#elevetable thead th {
+    padding: 12px;
+}
+
+/* Lignes du corps */
+#elevetable tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#elevetable tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Cellules */
+#elevetable td {
+    padding: 10px;
+    font-size: 15px;
+    text-align: center;
+    vertical-align: middle;
+    color: #333;
+}
+
+/* Icônes d’action */
+#elevetable td a {
+    font-size: 18px;
+    margin: 0 5px;
+    color: #1976d2;
+    transition: color 0.2s;
+    text-decoration: none;
+}
+
+#elevetable td a:hover {
+    color: #d32f2f;
+}
+
+/* Boutons style plat */
+.btn-primary {
+    background-color: #2196f3;
+    border: none;
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background-color: #1976d2;
+}
+
+/* Conteneur avec relief blanc */
+.table-container {
+    background-color: #ffffff;
+    margin: 2rem auto;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+/* Table moderne */
+#elevetable {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+#elevetable thead {
+    background-color: #1976d2;
+    color: white;
+}
+
+#elevetable thead th,
+#elevetable tbody td {
+    padding: 12px;
+    text-align: center;
+    font-size: 15px;
+}
+
+#elevetable tbody tr {
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#elevetable tbody tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Liens icônes */
+#elevetable td a {
+    color: #1976d2;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+#elevetable td a:hover {
+    color: #d32f2f;
+}

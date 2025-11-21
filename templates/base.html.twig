@@ -1,17 +1,120 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="ar" dir="rtl">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
-</html>
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Gestion de notes
+			{% endblock %}
+		</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link
+		rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+		{# dans base.html.twig, avant `</body>` #}
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+		{% block stylesheets %}
+			{{ encore_entry_link_tags('app') }}
+		{% endblock %}
+	</head>
+
+	<body>
+		{% include 'components/header.html.twig' %} 
+
+		<main class="main-content" style="text-align: right;"> 
+		{% block body %}{% endblock %}
+			</main>
+
+			{% include 'components/footer.html.twig' %}
+
+			{% block javascripts %}
+			{{ encore_entry_script_tags('app') }}
+			<script>
+				// ✅ Flash avec SweetAlert
+document.addEventListener('DOMContentLoaded', function () {
+{% for label, messages in app.flashes %}
+{% for message in messages %}
+Swal.fire({
+icon: '{{ label == "success" ? "success" : (label in ['
+				error ', '
+				danger '] ? "error" : "info") }}',
+title: '{{ label|capitalize }}',
+text: '{{ message|e('js') }}',
+showConfirmButton: true,
+position: 'center'
+});{% endfor %}
+{% endfor %}
+});
+			</script>
+
+			<script>
+				// ✅ Toggle menu mobile
+function toggleMenu() {
+document.getElementById('nav-menu').classList.toggle('show-menu');
+}
+// ✅ Menu déroulant utilisateur (ancienne version inline onclick)
+window.toggleUserMenu = function (event) {
+event.stopPropagation();
+const toggle = event.currentTarget;
+const menu = toggle.nextElementSibling;
+const allMenus = document.querySelectorAll('.user-menu');
+const allToggles = document.querySelectorAll('.user-toggle');
+allMenus.forEach(m => m !== menu && (m.style.display = 'none'));
+allToggles.forEach(t => t !== toggle && t.classList.remove('open'));
+const isOpen = menu.style.display === 'block';
+menu.style.display = isOpen ? 'none' : 'block';
+toggle.classList.toggle('open', ! isOpen);
+};
+// ✅ Active événements après chargement DOM
+document.addEventListener('DOMContentLoaded', () => { // Gestion du menu utilisateur
+document.querySelectorAll('.user-toggle').forEach(button => {
+button.addEventListener('click', toggleUserMenu);
+});
+// Sous-menus sur mobile
+if (window.innerWidth<= 768) {
+				document.querySelectorAll('.has-submenu> a ').forEach(link => {
+ link.addEventListener('click', function (e) {
+e.preventDefault();
+const parent = this.parentElement;
+parent.classList.toggle('open');
+});
+});
+}
+});
+// ✅ Fermer tous les menus au clic en dehors
+document.addEventListener('click', function () {
+document.querySelectorAll('.user-menu').forEach(menu => menu.style.display = 'none');
+document.querySelectorAll('.user-toggle').forEach(toggle => toggle.classList.remove('open'));
+document.querySelectorAll('.has-submenu').forEach(item => item.classList.remove('open'));
+}); </script>
+
+		<script>
+			document.addEventListener('DOMContentLoaded', function () {
+setInterval(() => {
+fetch('/api/user/status').then(response => {
+if (!response.ok) 
+// throw new Error('Not OK');
+return response.json();
+
+}).then(data => {
+if (data.status === 'freezed') {
+Swal.fire({
+icon: 'warning',
+title: 'تم تجميد الحساب',
+text: 'سيتم تسجيل الخروج الآن.',
+timer: 3000,
+showConfirmButton: false,
+willClose: () => {
+window.location.href = '{{ path('app_logout') }}';
+}
+});
+}
+}).catch(err => {
+console.warn('Vérification de statut échouée.', err);
+});
+}, 10000); // chaque 10 secondes
+});
+		</script>
+		
+			{% endblock %}
+		</body>
+	</html>

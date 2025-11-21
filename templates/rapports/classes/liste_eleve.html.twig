@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تقرير القسم</title>
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: white;
+            direction: rtl;
+            text-align: right;
+            margin: 2cm;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 6px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        h1,h3,h2 {
+            text-align: center;
+        }
+
+      body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('{{ asset("build/img/icons/logo100.png") }}');
+    background-repeat: repeat;
+    background-position: center;
+    background-size: 300px auto;
+    opacity: 0.05; /* Filigrane très léger */
+    z-index: -1; /* Derrière le contenu */
+    filter: grayscale(100%);
+    pointer-events: none; /* Pour éviter de bloquer les clics */
+}
+
+
+
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">🖨️ طباعة قائمة التلاميذ</button>
+    </div>
+    <h1>قائمة التلاميذ</h1>
+    <h2> {{ classe.lycee }} // {{ classe.nomClasse }}</h2>
+    <table>
+        <thead>
+            <tr>
+                 <th style="text-align: center; width: 10%;">رقم ب ت و</th>
+                 <th style="text-align: center; width: 10%;">الجنس</th>
+                <th style="text-align: center; width: 80%;">الإسم و اللقب</th>
+                
+               
+            </tr>
+        </thead>
+        <tbody>
+            {% for eleve in eleves %}
+                <tr>
+                     <td>{{ eleve.matricule }}</td>
+                     <td>{{ eleve.sexe == 'f' ? 'أنثى' : 'ذكر' }}</td>
+                    <td>{{ eleve.nomprenom }}</td>
+                    
+                   
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,142 @@
+{% block title %}{% endblock %}
+{% block stylesheets %}{% endblock %}
+
+{% block body %}
+	{% if app.user %}
+		<header class="header">
+			<div class="logo-text" onclick="window.location.href='{{ path('app_home') }}'">
+			<img src="{{ asset('build/img/icons/logo3.png') }}" alt="Logo" class="logo-img">
+				<span>بدر للخدمات </span>
+				
+			</div>
+
+
+			<!-- Burger menu (visible uniquement en mobile) -->
+			<button class="burger" id="burger-btn" aria-label="Menu" onclick="toggleMenu()">☰</button>
+
+			<nav class="nav-menu" id="nav-menu">
+				<div class="nav-item">
+					<a href="{{ path('app_home') }}">الرئيسية</a>
+				</div>
+				{% if is_granted('ROLE_ADMIN') %}
+					<div class="nav-item">
+						<a href="{{ path('operation_bac_index') }}">إدراج الأعداد</a>
+					</div>
+				{% endif %}
+				<div class="nav-item">
+					<a href="{{ path('app_lycee') }}">المعاهد</a>
+				</div>
+				<div class="nav-item">
+					<a href="{{ path('app_classes') }}">الأقسام
+					</a>
+				</div>
+				<div class="nav-item ">
+					<a href="{{ path('app_eleves') }}">التلاميذ</a>
+				</div>
+
+
+			</nav>
+			<div class="user-dropdown">
+				<div class="msg">
+					<a href="{{ path('chat') }}" id="chat-link" style="position:relative">
+						<img src="{{ asset('build/img/chat2.png') }}" alt="Chat" class="" style="width: 40px; height: 40px;">
+						<span id="chat-badge" style="display:none;								position:absolute; top:-6px; right:-6px;												background:#b34700; color:#fff;																font-size:11px; line-height:16px;														width:18px; height:18px; border-radius:50%;														text-align:center;">0</span>
+					</a>
+				</div>
+				<button class="user-toggle">
+					<img src="{{ asset('uploads/photoprofile/' ~ app.user.photo) }}" class="profile-pic" alt="Profil">
+					<span class="username">{{ app.user.user }}</span>
+					<i class="bi bi-chevron-down arrow-icon"></i>
+				</button>
+
+				<div class="user-menu" id="user-menu">
+					<a href="{{ path('app_profile') }}">
+						ملفك الشخصي 👤</a>
+					{% if is_granted('ROLE_ADMIN')%}
+						<a href="{{ path('admin') }}">
+							الإعدادات ⚙️</a>
+					{% endif %}
+					<div class="divider"></div>
+					<a href="{{ path('app_logout') }}">
+						تسجيل الخروج 🚪</a>
+				</div>
+			</div>
+
+		</header>
+	{% else %}
+		{% set redirect_url = path('login') %}
+		<script>
+			window.location.href = "{{ redirect_url }}";
+		</script>
+	{% endif %}
+
+{% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('app') }}
+	<script>
+		function toggleMenu() {
+const nav = document.getElementById('nav-menu');
+nav.classList.toggle('show-menu');
+}
+	</script>
+	<script>
+		(function () {
+const badge = document.getElementById('chat-badge');
+const chatUrl = '{{ path('chat_unread_count') }}';
+let lastCount = 0;
+
+async function refreshCount() {
+try {
+const res = await fetch(chatUrl, {cache: 'no-store'});
+const json = await res.json();
+const count = json.count ?? 0;
+
+if (count > 0) {
+badge.style.display = 'inline-block';
+badge.textContent = count > 99 ? '99+' : String(count);
+} else {
+badge.style.display = 'none';
+}
+
+if (count > lastCount) {
+playPing();
+showToast(count);
+}
+lastCount = count;
+} catch (e) {
+console.error('Erreur unread-count', e);
+}
+}
+
+function playPing() {
+const audio = new Audio('{{ asset("build/sounds/ping.mp3") }}');
+audio.play().catch(() => {});
+}
+
+function showToast(c) {
+const t = document.createElement('div');
+t.textContent = c === 1 ? 'رسالة جديدة' : c + ' رسائل جديدة';
+Object.assign(t.style, {
+position: 'fixed',
+bottom: '30px',
+left: '30px',
+background: '#1e1d64',
+color: '#fff',
+padding: '10px 18px',
+borderRadius: '12px',
+boxShadow: '0 2px 8px rgba(0,0,0,.3)',
+zIndex: 9999,
+opacity: 0,
+transition: 'opacity .3s'
+});
+document.body.appendChild(t);
+requestAnimationFrame(() => t.style.opacity = 1);
+setTimeout(() => t.style.opacity = 0, 4000);
+setTimeout(() => t.remove(), 5000);
+}
+
+refreshCount();
+setInterval(refreshCount, 10000);
+})();
+	</script>
+{% endblock %}

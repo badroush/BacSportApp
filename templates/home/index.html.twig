@@ -1,0 +1,354 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('app') }}
+	<style>
+		/* Style général */
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background-color: #f4f7fa;
+			margin: 0;
+			padding: 0;
+			color: #333;
+		}
+
+		.container-fluid {
+			padding: 2rem;
+		}
+
+		h1.mt-4 {
+			font-size: 2rem;
+			font-weight: 600;
+			color: #333;
+		}
+
+		/* Cartes */
+		.card {
+			border-radius: 15px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+			transition: transform 0.2s ease-in-out;
+			cursor: pointer;
+			overflow: hidden;
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+		}
+
+		.card-body {
+			font-size: 1.3rem;
+			font-weight: bold;
+			color: #000;
+			text-align: center;
+			padding: 1.5rem;
+		}
+
+		.card-footer {
+			background-color: rgba(0, 0, 0, 0.05);
+			padding: 0.75rem 1rem;
+			font-size: 1.9rem;
+		}
+
+		.card-footer a {
+			font-weight: bold;
+			text-decoration: none;
+			color: #00bcd4;
+			font-size: 2.3rem;
+		}
+
+		.card.bg-primary {
+			background-color: #00bcd4;
+			color: #fff;
+		}
+
+		.card.bg-warning {
+			background-color: #ff9800;
+			color: #fff;
+		}
+
+		.card.bg-success {
+			background-color: #4caf50;
+			color: #fff;
+		}
+
+		.card.bg-danger {
+			background-color: #f44336;
+			color: #fff;
+		}
+
+		.card-header {
+			font-weight: bold;
+			font-size: 1rem;
+			background-color: #eee;
+			border-bottom: 1px solid #ddd;
+		}
+
+		.breadcrumb {
+			background: transparent;
+			font-weight: 500;
+		}
+
+		/* Chart section */
+		canvas {
+			display: block;
+			margin: auto;
+		}
+
+		/* Responsive */
+		@media(max-width: 768px) {
+			.card-body {
+				font-size: 1rem;
+			}
+			h1.mt-4 {
+				font-size: 1.5rem;
+			}
+		}
+		/* Le graphe occupe toute la largeur dispo, hauteur fixe (modifiable) */
+		#chartWrapper {
+			width: 100%;
+			height: 420px;
+		}
+		#myBarChart {
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div id="layoutSidenav_content">
+		<main>
+			<div class="container-fluid px-4">
+				<h1 class="mt-4">منظومة التصرف باكالوريا تربية بدنية</h1>
+				<ol class="breadcrumb mb-4">
+					<li class="breadcrumb-item active">إحصائيات</li>
+				</ol>
+				<div class="row">
+
+
+					<div class="col-xl-2 col-md-3">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">
+								المعاهد</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small stretched-link" style="font-size: 25px;" href="#">{{ nblycee }}
+									{{ nomlycee }}</a>
+								<div class="small text-white">
+									🏛️
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-2 col-md-2">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">عدد الاقسام</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small stretched-link" href="#">{{ nbclasse }}</a>
+								<div class="small text-white">
+									🏫
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-2 col-md-3">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">عدد التلاميذ</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small stretched-link" href="#">{{ nbeleve }}</a>
+								<div class="small text-white">
+									👨‍🎓
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-2 col-md-3">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">عدد الإختبارات</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small stretched-link" href="#">{{ nbepreuve }}</a>
+								<div class="small text-white">
+									📝
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-2 col-md-3">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">عدد المعفيين</div>
+							<div class="card-footer d-flex align-items-center justify-content-between">
+								<a class="small  stretched-link" href="#">{{ nbdispense }}</a>
+								<div class="small text-white">
+									🚫🧍
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-2 col-md-3">
+						<div class="card bg-default text-white mb-4">
+							<div class="card-body">النسبة العامة</div>
+							{% if percent <= 50 %}
+								<div class="card-footer d-flex align-items-center justify-content-between">
+									<a class="small stretched-link" style="color: red;">{{ percent | number_format(2) }}
+										%</a>
+									<div class="small text-white">
+										❌
+									</div>
+								</div>
+							{% else %}
+								<div class="card-footer d-flex align-items-center justify-content-between">
+									<a class="small stretched-link" style="color: green; font-size: 28px;">{{ percent | number_format(2) }}
+										%</a>
+									<div class="small text-white">
+										✅
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+
+
+				</div>
+				<div class="row">
+					<div class="col-xl-12">
+						<div class="card mb-4">
+							<div class="card-header">
+								<i class="fas fa-chart-bar me-1"></i>
+								عدد التلاميذ حسب القسم و الجنس
+							</div>
+							<div class="card-body" id="chartWrapper">
+								<canvas id="myBarChart" width="100%" height="100%"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="card mb-4">
+					<div class="card-header">
+						<i class="fas fa-table me-1"></i>
+						إحصائيات المعاهد حسب تاريخ الإختبار
+					</div>
+					<div class="card-body" style="width: 100%;">
+						<div
+							class="table-responsive">
+							<!-- ✅ ajout de cette div -->
+							<div class="container mt-5" style="width: 100%;">
+								<div class="row">
+								</div>
+								<table id="state_table" class="table table-bordered table-striped table-hover" style="width:100%">
+									<thead class="table-info text-center">
+										<tr>
+											<th>المعهد</th>
+											<th>المركز</th>
+											<th>عدد الأقسام</th>
+											<th>عدد التلاميذ</th>
+											<th>عدد المعفيين</th>
+											<th>عدد الغائبين</th>
+											<th>عدد الإختيارات</th>
+											<th>تاريخ</th>
+
+
+										</tr>
+									</thead>
+									<tbody>
+										{% for r in stats %}
+											{# {% set r.rowColor = r.rowColor|default('#fc5d5d') %} #}
+											<tr style="background-color:{{ r.rowColor }} !important;">
+												<td class="text-end" style="background-color: {{ r.rowColor }} !important; color:'black';">{{ r.lycee }}</td>
+												<td class="text-end">{{ r.centre }}</td>
+												<td class="text-center">{{ r.nb_classes }}</td>
+												<td class="text-center">{{ r.nb_eleves }}</td>
+												<td class="text-center">{{ r.nb_dispenses }}</td>
+												<td class="text-center">
+													{{ r.nb_absences }}
+												</td>
+												<td class="text-center">{{ r.nb_epreuves }}</td>
+												<td class="text-center">{{ r.dateEpreuve|date('Y-m-d') }}
+												</td>
+											</tr>
+										{% endfor %}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{ parent() }}{{ encore_entry_script_tags('app') }}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js "></script>
+	<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.js "></script>
+	<script>
+		const labels = {{ labels | json_encode | raw }};
+const garcons = {{ garcons | json_encode | raw }};
+const filles = {{ filles | json_encode | raw }};
+const ctx = document.getElementById('myBarChart').getContext('2d');
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels,
+datasets: [
+{ // segment "Garçons"
+label: 'ذكور',
+data: garcons,
+backgroundColor: 'rgba(54,162,235,0.8)',
+stack: 'effectif' // même pile
+}, { // segment "Filles"
+label: 'إناث',
+data: filles,
+backgroundColor: 'rgba(255,99,132,0.8)',
+stack: 'effectif'
+}
+]
+},
+options: {
+responsive: true,
+maintainAspectRatio: false, // ⇒ suit la hauteur du wrapper
+scales: {
+x: { // axe des classes
+stacked: true, // ← empilement horizontal
+ticks: {
+font: {
+size: 11
+}
+},
+categoryPercentage: 0.75, // espace réservé à la barre
+barPercentage: 0.9 // largeur de la barre dans le bloc
+},
+y: { // axe des effectifs
+stacked: true, // ← empilement vertical
+beginAtZero: true,
+grace: '5%' // petit espace au‑dessus
+}
+},
+plugins: {
+legend: {
+position: 'top'
+},
+tooltip: {
+enabled: true
+}
+}
+}
+});
+	</script>
+	<script>
+		$(document).ready(function () {
+$('#state_table').DataTable({
+language: {
+url: 'build/js/datatable/langAr.json'
+},
+paging: true,
+lengthMenu: [
+10, 25, 50, 100
+],
+searching: true,
+ordering: true,
+autoWidth: false,
+responsive: true
+});
+});
+	</script>
+{% endblock %}

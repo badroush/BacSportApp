@@ -1,0 +1,216 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<div
+		class="chat-wrapper">
+
+		{# ---------------- Colonne messages ---------------- #}
+		<div class="chat-messages">
+			<h2 class="chat-title">💬 المحادثة</h2>
+
+			<div id="chat-box" class="chat-box"></div>
+
+			<form id="chat-form" class="chat-form">
+				<button type="submit">
+					إرسال</button>
+				<input type="text" id="msg" placeholder="اكتب رسالة..." autocomplete="off" required style="flex: 1; text-align: right;">
+			</form>
+		</div>
+
+		{# ---------------- Colonne utilisateurs ---------------- #}
+		<div class="chat-users">
+			<h3 class="users-title">
+				المتصلون</h3>
+
+			<label>اختر المستخدم :</label>
+			<select id="receiver">
+				<option value="">-- اختر --</option>
+				{% for u in users %}
+					{% if u != app.user %}
+						<option value="{{ u.id }}">{{ u.user }}</option>
+					{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ encore_entry_script_tags('app') }}
+		{{ parent()}}
+	<script>
+
+		const me = {
+id: {{ app.user.id }},
+name: "{{ app.user.user|e('js') }}",
+photo: "{{ asset('uploads/photoprofile/' ~ app.user.photo) }}"
+};
+	</script>
+	<script>
+		const box = document.getElementById('chat-box');
+const select = document.getElementById('receiver');
+const form = document.getElementById('chat-form');
+const input = document.getElementById('msg');
+let nomsender = '';
+let currentId = null;
+// Affiche la valeur sélectionnée dans le select
+if (select) {
+select.addEventListener('change', function () {
+nomsender = select.options[select.selectedIndex].text;
+//console.log("Nom de l’expéditeur sélectionné :", nomsender);
+});
+// Initialisation dès le chargement
+nomsender = select.options[select.selectedIndex].text;
+//console.log("Nom de l’expéditeur initial :", nomsender);
+}
+function append(msg, fromMe) { // console.log(msg, fromMe);
+const div = document.createElement('div');
+div.style.textAlign = fromMe ? 'right' : 'left';
+div.innerHTML = fromMe ? msg : '<b>' + nomsender + '</b>: ' + msg;
+box.appendChild(div);
+box.scrollTop = box.scrollHeight;
+}
+/* Récupération périodique */
+async function fetchMessages() {
+if (! currentId) 
+return;
+const res = await fetch (`/chat/messages/${currentId}`);
+const data = await res.json();
+
+box.innerHTML = '';
+data.forEach(d => append(d.content, d.fromMe));
+}
+
+setInterval(fetchMessages, 3000);
+select.addEventListener('change', () => {
+currentId = select.value || null;
+fetchMessages();
+});
+form.addEventListener('submit', async e => {
+e.preventDefault();
+if (! currentId) 
+return alert('Choisir un destinataire.');
+const content = input.value.trim();
+if (! content) 
+return;
+
+await fetch('/chat/send', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: new URLSearchParams(
+{receiver: currentId, content}
+)
+});
+input.value = '';
+fetchMessages();
+});
+	</script>
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	{{ encore_entry_link_tags('app') }}
+	<style>
+		/* --------- Palette BsportApp (bleu nuit + orange) --------- */
+
+		.chat-wrapper {
+			direction: ltr; /* on garde le flux LTR pour l’agencement */
+			display: flex;
+			max-width: 1100px;
+			height: 85vh;
+			margin: 20px auto;
+			border-radius: 16px;
+			overflow: hidden;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+		}
+		.chat-messages {
+			flex: 3;
+			display: flex;
+			flex-direction: column;
+			background: #ffffff;
+		}
+		.chat-title {
+			background: #1e1d64;
+			color: #fff;
+			padding: 14px 18px;
+			margin: 0;
+			font-size: 18px;
+		}
+		.chat-box {
+			flex: 1;
+			padding: 18px;
+			overflow-y: auto;
+			background: #ecf0f1;
+					}
+		/* Bulle générique */
+		.chat-box div {
+			margin: 6px 0;
+			padding: 8px 12px;
+			border-radius: 12px;
+			max-width: 50%;
+			word-wrap: break-word;
+			display: block; /* empile les bulles */
+		}
+		.chat-box div[style*="text-align: right"] {
+			margin-left: auto; /* colle à droite */
+			background: #dff4ff;
+		}
+		.chat-box div[style*="text-align: left"] {
+			margin-right: auto; /* colle à gauche */
+			background: #ffffff;
+		}
+		.chat-form {
+			display: flex;
+			gap: 10px;
+			padding: 14px 18px;
+			background: #f7f9fb;
+			border-top: 1px solid #ddd;
+		}
+		.chat-form input {
+			flex: 1;
+			padding: 10px;
+			border: 1px solid #ccc;
+			border-radius: 12px;
+			font-size: 15px;
+		}
+		.chat-form button {
+			background: #b34700;
+			color: #fff;
+			border: none;
+			padding: 10px 18px;
+			border-radius: 12px;
+			font-weight: bold;
+			cursor: pointer;
+			transition: background 0.25s;
+		}
+		.chat-form button:hover {
+			background: #963600;
+		}
+		.chat-users {
+			flex: 1;
+			background: #34495e;
+			color: #fff;
+			display: flex;
+			flex-direction: column;
+			padding: 18px;
+		}
+		.users-title {
+			margin: 0 0 10px;
+			font-size: 17px;
+		}
+		.chat-users label {
+			margin-bottom: 6px;
+			font-weight: bold;
+		}
+		.chat-users select {
+			padding: 8px;
+			width: 100%;
+			border-radius: 10px;
+			border: none;
+			font-size: 15px;
+		}
+
+	</style>
+{% endblock %}

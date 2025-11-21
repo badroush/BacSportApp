@@ -1,0 +1,161 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}تعديل الملف الشخصي
+{% endblock %}
+
+{% block header %}
+	{% include 'components/header.html.twig' %}
+{% endblock %}
+
+{% block stylesheets %}
+	{{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block body %}
+	{% if app.user %}
+		<div class="container">
+			<div class="main-body">
+				<div class="row">
+					<div class="col-md-4 mb-3">
+						<div class="card">
+							<div class="card-body">
+								<div class="d-flex flex-column align-items-center text-center">
+									<img src="{{ asset('uploads/photoprofile/' ~ app.user.photo) }}" alt="Admin" class="rounded-circle" width="150">
+									<div class="mt-3">
+										<h4>{{ app.user.user }}</h4>
+										<p class="text-muted font-size-sm">{{ app.user.email }}</p>
+
+									</div>
+								</div>
+
+							</div>
+						</div>
+					</div>
+
+
+					<div class="col-lg-8">
+						<div class="card">
+							{{ form_start(form, {
+									'action': path('edit_profile'),
+									'attr': {
+										'id': 'profile-form',
+										'enctype': 'multipart/form-data',
+										'novalidate': 'novalidate'
+									}
+								}) }}
+							<div class="card-body">
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">الإسم و اللقب</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ form_widget(form.user, {'attr': {'class': 'form-control', 'dir': 'rtl'}}) }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">البريد الإلكتروني</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ form_widget(form.email, {'attr': {'class': 'form-control', 'dir': 'rtl'}}) }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">رقم الهاتف</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ form_widget(form.mobile, {'attr': {'class': 'form-control', 'dir': 'rtl'}}) }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">كلمةالعبور</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ form_widget(form.plainPassword, {'attr': {'class': 'form-control', 'dir': 'rtl'}}) }}
+									</div>
+									
+								</div>
+								<hr>
+								<div class="row">
+								<div class="col-sm-3">
+										<h6 class="mb-0">صورة الملف الشخصي</h6>
+									</div>
+									<div class="col-sm-9 text-secondary">
+										{{ form_widget(form.photo, {'attr': {'class': 'form-control', 'dir': 'rtl'}}) }}
+									</div>
+									
+								</div>
+								<hr>
+								<hr>
+								<div class="row">
+									<div class="col-sm-12">
+										<a class="btn btn-danger btn-block" href="{{ path('app_profile') }}">إلغاء</a>
+										<button type="submit" class="btn btn-info">حفظ التغييرات</button>
+
+									</div>
+								</div>
+							</div>
+							{{ form_end(form) }}
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div id="preloader-overlay" style="
+							position: fixed;
+							top: 0;
+							left: 0;
+							width: 100vw;
+							height: 100vh;
+							background: rgba(255, 255, 255, 0.85);
+							z-index: 9999;
+							display: none;
+							align-items: center;
+							justify-content: center;
+							flex-direction: column;
+								">
+			<img src="{{ asset('build/img/loader.gif') }}" style="width: 60px;">
+			<p class="mt-3 text-primary">🔄 جاري تحديث الملف الشخصي، الرجاء الانتظار...</p>
+		</div>
+	{% endif %}
+{% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('app') }}
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script>
+		document.addEventListener('DOMContentLoaded', function (){
+			{% for label, messages in app.flashes %}
+{% for message in messages %}
+Swal.fire({icon: '{{ label == "success" ? "success" : "error" }}', title: '{{ label == "success" ? "تم بنجاح 🎉" : "خطأ" }}', text: '{{ message|e('js') }}', confirmButtonText: 'حسناً'});{% endfor %}
+{% endfor %}
+});
+	</script>
+	<script>
+		const form = document.getElementById('profile-form');
+const overlay = document.getElementById('preloader-overlay');
+if (form && overlay) {
+form.addEventListener('submit', function () {
+overlay.style.display = 'flex';
+document.body.style.overflow = 'hidden';
+});
+}
+	</script>
+	<script>
+		window.addEventListener('load', () => {
+const overlay = document.getElementById('preloader-overlay');
+if (overlay) {
+overlay.style.display = 'none'; // Cache le préloader si présent
+document.body.style.overflow = 'auto'; // Rétablit le scroll
+}
+});
+	</script>
+{% endblock %}

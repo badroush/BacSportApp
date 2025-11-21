@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+	<head>
+		<meta charset="UTF-8">
+		{% block stylesheets %}
+			{# {{ parent() }} #}
+			<style>
+				@media print {
+					@page {
+						size: portrait;
+						margin: 5mm; /* marge minimale, tu peux mettre 0 si tu veux */
+					}
+					body {
+						margin: 0; /* supprime marge éventuelle du body */
+					}
+				}
+
+				body {
+					font-family: 'Cairo', sans-serif;
+					direction: rtl;
+					color: #111;
+					font-size: 15px;
+					margin: 0;
+					padding: 0.5rem;
+					background-color: #fff;
+				}
+
+				.container,
+				.receipt {
+					max-width: 750px;
+					margin: auto auto 0.5rem;
+					padding: 1rem;
+					border: 1px solid #ccc;
+					border-radius: 12px;
+					box-shadow: 0 0 10px rgba(0, 0, 0, 0.07);
+				}
+
+				.qr {
+					text-align: left;
+					margin-bottom: 1rem;
+				}
+
+				.qr img {
+					width: 80px;
+					height: 80px;
+				}
+
+				.header {
+					text-align: right;
+					top: 10px;
+					right: 30px;
+					line-height: 1.2;
+					margin: 0;
+				}
+
+				.header p {
+					margin: 0;
+					padding: 0;
+					font-size: 14px;
+				}
+
+
+				.title {
+					text-align: center;
+					font-size: 18px;
+					font-weight: bold;
+					margin: O.5rem 0;
+
+				}
+				.title-box {
+					height: 50px;
+					padding: 0 20px;
+					line-height: 50px;
+					border: 2px solid #333;
+					border-radius: 12px;
+					text-align: center;
+					font-size: 22px;
+					font-weight: bold;
+					display: block; /* important pour que margin auto fonctionne */
+					width: fit-content; /* ou fixe comme width: 300px; si tu veux */
+					margin: 0 auto; /* centre horizontalement */
+					direction: rtl;
+				}
+
+
+				.subtitle {
+					text-align: center;
+					font-weight: bold;
+					margin-bottom: 1.5rem;
+				}
+
+				.table-identity {
+					width: 100%;
+					border-collapse: collapse;
+					margin-bottom: 1rem;
+				}
+
+				.table-identity td {
+					padding: 8px;
+					border-bottom: 1px solid #ddd;
+				}
+
+				.table-identity td:first-child {
+					width: 35%;
+					font-weight: 600;
+					color: #333;
+				}
+
+				.signature {
+					margin-top: 0.5rem;
+					text-align: left;
+					font-weight: bold;
+				}
+
+				.notes {
+					background-color: #f7f7f7;
+					padding: 1rem;
+					border-radius: 8px;
+					font-size: 13px;
+				}
+
+				.notes ol {
+					padding-right: 1.5rem;
+					margin: 0;
+				}
+
+				.notes li {
+					margin-bottom: 6px;
+				}
+				{# .page-break {
+					page-break-after: always;
+				} #}
+
+                @media print {
+		@page {
+			size: A4 portrait;
+			margin: 5mm; /* ou 0 si tu veux aucune marge */
+		}
+
+		html, body {
+			margin: 0;
+			padding: 0;
+			width: 100%;
+			height: 100%;
+			-webkit-print-color-adjust: exact; /* pour respecter les couleurs */
+			print-color-adjust: exact;
+		}
+
+		.container {
+			page-break-inside: avoid;
+			break-inside: avoid;
+		}
+
+		/* Forcer la coupure après chaque convocation */
+		.page-break {
+			page-break-after: always;
+		}
+	}
+			</style>
+		{% endblock %}
+	</head>
+</html>
+{% for eleve in eleves %}
+	<div class="container">
+		<div class="header">
+			<p>الجمهورية التونسية</p>
+			<p>وزارة التربية</p>
+			<p>المندوبية الجهوية بمدنين</p>
+			<p>{{ school }}</p>
+		</div>
+
+		<div class="title">امتحان البكالوريا - دورة
+			{{ year }}</div>
+		<div class="subtitle">اختبار آخر السنة في مادة التربية البدنية<br>خاص بالمعاهد
+			{{ type == 'priv' ? 'الخاصة' : 'العمومية' }}
+		</div>
+		<div class="title-box">استدعــــــــــــــــاء</div>
+
+		<table class="table-identity">
+			<tr>
+				<td>الإسم و اللقب :</td>
+				<td>{{ eleve.nomPrenom }}</td>
+			</tr>
+			<tr>
+				<td style="width: 90px; white-space: nowrap;">ر.ب.ت.و :</td>
+				<td>
+					<table style="
+																	border-collapse: separate;
+																	border-spacing: 6px; /* espace entre les cellules */
+																	display: inline-table;
+																	table-layout: fixed;
+																	width: calc(8 * 30px + 7 * 6px); /* 8 cellules + 7 espaces */
+																">
+						<tr>
+							{% for char in eleve.matricule|split('')|reverse %}
+								<td style="
+																																																	border: 1px solid #333;
+																																																	border-radius: 8px;
+																																																	width: 15px;
+																																																	height: 15px;
+																																																	text-align: center;
+																																																	font-weight: bold;
+																																																	font-size: 15px;
+																																																	background: white; /* pour mieux voir les arrondis */
+																																																	vertical-align: middle;
+																																																">
+									{{ char }}
+								</td>
+							{% endfor %}
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>الشعبة :</td>
+				<td>{{ section }}</td>
+			</tr>
+			<tr>
+				<td>المعهد الأصلي :</td>
+				<td>{{ school }}</td>
+			</tr>
+			<tr>
+				<td>مركز الإختبار :</td>
+				<td>{{ center }}</td>
+			</tr>
+			<tr>
+				<td>تاريخ إجراء الإختبار :</td>
+				<td>{{ date }}</td>
+			</tr>
+			<tr>
+				<td>التوقيت :</td>
+				<td>{{ time }}</td>
+			</tr>
+		</table>
+
+		<div class="signature">
+			الإمضاء و الطابع
+			<br>{{ type == 'priv' ? 'المندوب الجهوي ' : 'مدير(ة) المعهد' }}
+
+		</div><br><br>
+
+		<div class="notes">
+			<ol>
+				<li>ضرورة الاستظهار بهذا الاستدعاء يوم الاختبار مصحوبا ببطاقة التعريف الوطنية</li>
+				<li>ضرورة إحضار الزي الرياضي والتمسك بالفوج الذي ينتمي إليه</li>
+				<li>كل تلميذ تعذر عليه اجتياز الاختبار لموانع صحية طارئة يجب عليه تقديم ملفه الصحي قبل يوم الجمعة 03 ماي 2025</li>
+				<li>كل تلميذ أدرج اسمه بقائمة المعفيين لا يحق له اجتياز هذا الاختبار</li>
+			</ol>
+		</div>
+	</div>
+
+	<div class="receipt">
+		<div class="title">امتحان البكالوريا - دورة
+			{{ year }}</div>
+		<div class="subtitle">وصل تسلم استدعاء لاجتياز اختبار آخر السنة في مادة التربية البدنية</div>
+
+		<table class="table-identity">
+			<tr>
+				<td>الإسم و اللقب :</td>
+				<td>{{ eleve.nomPrenom }}</td>
+			</tr>
+			<tr>
+				<td>القسم :</td>
+				<td>{{ classe }}</td>
+			</tr>
+			<tr>
+				<td>الشعبة :</td>
+				<td>{{ section }}</td>
+			</tr>
+			<tr>
+				<td>المعهد :</td>
+				<td>{{ school }}</td>
+			</tr>
+			<tr>
+				<td>تاريخ تسلم الاستدعاء :</td>
+				<td></td>
+			</tr>
+		</table>
+
+		<div class="signature">
+			إمضاء المترشح(ة)
+		</div>
+	</div>
+{% endfor %}
+
+<script>
+	window.onload = function () {
+window.print();
+};
+</script>

@@ -1,0 +1,280 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}الأقسام
+{% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.css"/>
+	<style>
+		.circle-progress {
+			position: relative;
+			width: 40px;
+			height: 40px;
+			display: inline-block;
+			vertical-align: middle;
+		}
+
+		.progress-ring {
+			transform: rotate(-90deg);
+		}
+
+		.progress-ring circle {
+			fill: none;
+			stroke-width: 4;
+		}
+
+		.progress-ring .bg {
+			stroke: #e6e6e6;
+		}
+
+		.progress-ring .progress {
+			stroke: green;
+			stroke-linecap: round;
+			stroke-dasharray: 113;
+			stroke-dashoffset: 113;
+			transition: stroke-dashoffset 0.5s ease;
+		}
+
+		.percent-text {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 10px;
+			font-weight: bold;
+			color: #333;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h3>قائمة الأقسام  👁️
+				</h3>
+				{% for action in actions %}
+					{% if (is_granted('ROLE_ADMIN') and action.actions == 'add_classe') or (action.actions == 'add_classe' and action.active and not action.masque) %}
+						<a href="#" class="btn btn-secondary btn-block me-2" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#addClasseModal">إضافة قسم جديد➕</a>
+					{% endif %}
+				{% endfor %}
+			</div>
+		</div>
+		<div class="table-container">
+			<table id="classestable" class="table table-striped table-bordered" style="width:100%">
+				<thead>
+					<tr>
+						<th style="text-align: right;">المعهد</th>
+						<th style="text-align: right;">القسم</th>
+						<th style="text-align: right;">عدد التلاميذ</th>
+						<th style="text-align: center;"></th>
+
+
+					</tr>
+				</thead>
+				<tbody>
+
+					{% for classe in classes %}
+						<tr>
+							<td>{{ classe.lycee }}</td>
+							<td>{{ classe.nomclasse }}{{ classe.num }}</td>
+							<td>{{ nbelves[classe.id].nb }}</td>
+							<td>
+
+								{% set p = (rows[classe.id].percent * 100)|round(0, 'floor') %}
+								{% set color = p >= 100 ? 'success' : (p >= 50 ? 'warning' : 'danger') %}
+								<!-- Cercle de progression -->
+								<div class="circle-progress me-2">
+									<svg class="progress-ring" width="40" height="40">
+										<circle class="bg" r="18" cx="20" cy="20"></circle>
+										<circle class="progress bg-{{ color }}" r="18" cx="20" cy="20" style="stroke-dashoffset: {{ 113 - (p * 113 / 100) }}"></circle>
+									</svg>
+									<div class="percent-text">{{ p }}%</div>
+								</div>
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'selectepreuve_classe') or (action.actions == 'selectepreuve_classe' and action.active and not action.masque) %}
+										<select class="epreuve-select" name="epreuve_type" data-classe-id="{{ classe.id }}">
+											<option value="">-- Sélectionner --</option>
+											<option value="6h">عدو ذكور</option>
+											<option value="6f">عدو إناث</option>
+											<option value="8h">وثب ذكور</option>
+											<option value="8f">وثب إناث</option>
+											<option value="11h">رمي ذكور</option>
+											<option value="11f">رمي إناث</option>
+											<option value="12h">جمباز ذكور</option>
+											<option value="12f">جمباز إناث</option>
+										</select>
+									{% endif %}
+								{% endfor %}
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'listedeuxplein_classe') or (action.actions == 'listedeuxplein_classe' and action.active and not action.masque) %}
+										<a href="{{ path('listeno2_classe', {'id': classe.id}) }}" onclick="ouvrirPopup(this.href); return false;" style="text-decoration: none;" title="القايمة عدد 2">
+											2️⃣</a>
+									{% endif %}
+								{% endfor %}
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'listedeuxvide_classe') or (action.actions == 'listedeuxvide_classe' and action.active and not action.masque) %}
+										<a href="{{ path('listeno2vide_classe', {'id': classe.id}) }}" onclick="ouvrirPopup(this.href); return false;" style="text-decoration: none;" title="القايمة عدد 2">
+											②</a>
+									{% endif %}
+								{% endfor %}
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'listeun_classe') or (action.actions == 'listeun_classe' and action.active and not action.masque) %}
+										<a href="{{ path('app_classe_epreuves', {'id': classe.id}) }}" onclick="ouvrirPopup(this.href); return false;" style="text-decoration: none;" title="القايمة عدد 1">
+											1️⃣
+										</a>
+									{% endif %}
+								{% endfor %}
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'show_classe') or (action.actions == 'show_classe' and action.active and not action.masque) %}
+										<a href="{{ path('classe_rapport', {'id': classe.id}) }}" onclick="ouvrirPopup(this.href); return false;" style="text-decoration: none;" title="قائمة التلاميذ">
+											📑</a>
+									{% endif %}
+								{% endfor %}
+
+
+								<a href="{{ path('modele_excel_par_classe', {id: classe.id}) }}" class="btn btn-sm btn-outline-primary"><img src="{{ asset('build/img/download.png') }}" width="20" height="20" alt="تحميل القايمة"></a>
+                                 {% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'printconvocation_classe') or (action.actions == 'printconvocation_classe' and action.active and not action.masque) %}
+								<a href="{{ path('convocation_par_classe', {id: classe.id}) }}" class="btn btn-outline-primary" target="_blank">
+									<img src="{{ asset('build/img/all_conv.png') }}" alt="الإستدعاءات مجمعة" width="20" height="20" class="">
+								</a>
+								{% endif %}
+								{% endfor %}
+
+								{% for action in actions %}
+									{% if (is_granted('ROLE_ADMIN') and action.actions == 'delete_classe') or (action.actions == 'delete_classe' and action.active and not action.masque) %}
+										<a href="{{ path('classe_delete', {id: classe.id}) }}" class="btn btn-outline-primary" data-id="{{ classe.id }}" style="text-decoration: none;" title="حذف"><img src="{{ asset('build/img/delete.png') }}" alt="حذف" width="20" height="20" class=""></a>
+
+									{% endif %}
+								{% endfor %}
+
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</tbody>
+		</table>
+	</div>
+	<!-- Preloader (ex : un spinner Bootstrap) -->
+	<div id="preloader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999;">
+		<div class="d-flex justify-content-center align-items-center h-100">
+			<div class="spinner-border text-primary" role="status">
+				<span class="visually-hidden">Chargement...</span>
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Modal -->
+	<div class="modal fade" id="addClasseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="exampleModalLabel">إضافة قسم جديد</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					{{ form_start(form, {'action': path('app_classes'),'method': 'POST'}) }}
+					<div class="mb-3">
+						{{ form_widget(form.lycee, {'attr': {'class': 'form-select','placeholder': 'المعهد', 'dir': 'rtl'}}) }}
+					</div>
+					<div class="mb-3">
+						{{ form_widget(form.nomClasse, {'attr': {'class': 'form-select','placeholder': 'القسم', 'dir': 'rtl'}}) }}
+					</div>
+					<div class="mb-3">
+						{{ form_widget(form.num, {'attr': {'class': 'form-select','placeholder': 'رقم القسم', 'dir': 'rtl'}}) }}
+					</div>
+					<div class="text-end">
+						<button type="submit" class="btn btn-success btn-block">💾 تسجيل</button>
+					</div>
+					{{ form_end(form) }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js "></script>
+<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.js "></script>
+<script>
+	$(document).ready(function () {
+$('#classestable').DataTable({
+language: {
+url: 'build/js/datatable/langAr.json'
+},
+paging: true,
+lengthMenu: [
+10, 25, 50, 100
+],
+searching: true,
+ordering: true,
+autoWidth: false,
+responsive: true
+});
+});
+</script>
+
+<script>
+	function ouvrirPopup(url) {
+window.open(url, 'popupWindow', 'width=900,height=700,scrollbars=yes,resizable=yes', print = true);
+}
+</script>
+<script>
+	document.querySelectorAll('.epreuve-select').forEach(select => {
+select.addEventListener('change', function () {
+const selected = this.value;
+const classeId = this.getAttribute('data-classe-id');
+
+if (selected && classeId) {
+const url = `/classe/${classeId}/fiche-epreuve?type=${
+encodeURIComponent(selected)
+}`;
+window.open(url, '_blank', 'width=1000,height=800');
+
+// Reset pour permettre de rechoisir la même option plus tard
+setTimeout(() => {
+this.selectedIndex = 0;
+}, 200);
+}
+});
+});
+</script>
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+const form = document.querySelector('form[name="  {{ form.vars.name }}"]');
+const preloader = document.getElementById('preloader');
+if (form && preloader) {
+form.addEventListener('submit', function () {
+preloader.style.display = 'block';
+});
+}
+});
+</script>
+
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+document.querySelectorAll('.btn-delete').forEach(function (btn) {
+btn.addEventListener('click', function (e) {
+e.preventDefault();
+const href = btn.getAttribute('href');
+Swal.fire({
+title: 'هل أنت متأكد؟',
+text: "لا يمكنك التراجع بعد ذلك !",
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#d33',
+cancelButtonColor: '#3085d6',
+confirmButtonText: 'نعم، احذف!',
+cancelButtonText: 'إلغاء'
+}).then((result) => {
+if (result.isConfirmed) {
+window.location.href = href;
+}
+});
+});
+});
+});
+</script>{% endblock %}

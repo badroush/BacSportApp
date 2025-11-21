@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}تعديل تلميذ
+{% endblock %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.form-label {
+			font-weight: bold;
+		}
+
+		h2 {
+			color: #2c3e50;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h3>إضافة اختبار جديد للتلميذ ✏️</h3>
+				<a href="{{ path('app_eleves') }}" class="btn btn-secondary">⬅️ العودة إلى القائمة</a>
+			</div>
+		</div>
+
+		<div
+			class="row">
+			{# Formulaire simple pour changer l'état #}
+
+			<form action="{{ path('changer_etat_eleve', {'cin': eleve.cin}) }}" method="POST" class="mb-3 d-flex align-items-center border-2 rounded p-2">
+				<label for="etat" class="me-1 w-auto h-fit">
+					{% if eleve.dispenses|length > 0 %}
+						{% if eleve.dispenses[0].state == 'present' %}
+							<p class="alert alert-success">
+								الحالة الحالية :
+								<strong>حاضر</strong>
+							</p>
+						{% elseif eleve.dispenses[0].state == 'absent' %}
+							<p class="alert alert-danger">
+								الحالة الحالية :
+								<strong>غائب</strong>
+							</p>
+						{% elseif eleve.dispenses[0].state == 'dispense' %}
+							<p class="alert alert-warning">
+								الحالة الحالية :
+								<strong>معفى</strong>
+							</p>
+						{% endif %}
+					{% else %}
+						<p class="alert alert-info">
+							<strong>غير محدد</strong>
+							: الحالة الحالية</p>
+					{% endif %}
+				</label>
+				<select name="etat" id="etat" class="form-select w-auto me-2">
+					<option value="">-- إختر --</option>
+					<option value="present">حاضر</option>
+					<option value="absent">غائب</option>
+					<option value="dispense">معفى</option>
+				</select>
+				<button type="submit" class="btn btn-warning">✔️ تحديث الحالة</button>
+			</form>
+			<!-- ✅ Liste des épreuves existantes -->
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header text-center">
+						<strong>
+							الإختبارات المضافة سابقا 📋</strong>
+					</div>
+					<div class="card-body">
+						{% if epreuvesExistantes is empty %}
+							<p class="text-muted text-center">لا يوجد اختبارات مضافة لهذا التلميذ بعد.</p>
+						{% else %}
+							<ul class="list-group">
+								{% for ep in epreuvesExistantes %}
+									{# {{ dump(ep.id) }} #}
+									<li class="list-group-item d-flex justify-content-between align-items-center">
+										<form method="post" action="{{ path('epreuve_bac_delete', {id: ep.id}) }}" class="delete-form">
+											<input type="hidden" name="_token" value="{{ csrf_token('delete_epreuvebac_' ~ ep.id) }}">
+											<button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">🗑️</button>
+										</form>
+
+										<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+										<script>
+											document.querySelectorAll('.delete-form').forEach(form => {
+form.addEventListener('submit', function (e) {
+e.preventDefault(); // Empêche la soumission immédiate
+Swal.fire({
+title: 'هل أنت متأكد من حذف هذه الإختبار ؟',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#d33',
+cancelButtonColor: '#3085d6',
+confirmButtonText: 'نعم، احذف',
+cancelButtonText: 'إلغاء'
+}).then((result) => {
+if (result.isConfirmed) { // Si confirmé, soumettre le formulaire
+form.submit();
+}
+});
+});
+});
+										</script>
+
+										<span>
+											<span class="badge bg-primary w-100">{{ ep.epreuve.libelle }}</span>
+										</span>
+									</li>
+								{% endfor %}
+							</ul>
+
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<!-- ✅ Formulaire à droite -->
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header text-center">
+						<strong>
+							إضافة اختبار جديد للتلميذ:
+							<strong>{{ eleve.nomprenom }}
+								✏️</strong>
+						</div>
+						<div class="card-body">
+							<p class="text-center"></p>
+						</strong>
+					</p>
+                    {% if is_granted('ROLE_ADMIN') or state=='present' %}
+					{{ form_start(form) }}
+					<div class="mb-3">
+						{{ form_widget(form.eleve, {'attr': {'class': 'form-select'}}) }}
+					</div>
+					<div class="mb-3">
+						{{ form_label(form.epreuve) }}
+						{{ form_widget(form.epreuve, {'attr': {'class': 'form-select'}}) }}
+					</div>
+					<button class="btn btn-success w-100">💾 تسجيل</button>
+					{{ form_end(form) }}
+                    {% else %}
+                    <p class="text-center">لا يمكنك تسجيل اختبار لاحقا</p>
+                    {% endif %}
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>{% endblock %}

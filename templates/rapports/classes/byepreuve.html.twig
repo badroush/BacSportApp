@@ -1,0 +1,185 @@
+{# templates/classe/epreuve_popup.html.twig #}
+
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<title>Fiche Épreuve</title>
+		<style>
+			body {
+				font-family: 'Segoe UI', sans-serif;
+				padding: 1rem;
+			}
+			.header-table {
+				width: 100%;
+				border-collapse: collapse;
+				text-align: center;
+				font-family: "Tajawal", sans-serif;
+				margin-bottom: 20px;
+				font-size: 18px;
+			}
+			.header-table td {
+				padding: 8px;
+			}
+			.header-info {
+				font-weight: bold;
+				font-size: 19px;
+			}
+			.section-footer {
+				background-color: #ddd;
+				font-weight: bold;
+				padding: 8px;
+				font-size: 17px;
+			}
+			.styled-table {
+				width: 100%;
+				border-collapse: separate;
+				border-spacing: 0;
+				font-size: 18px; /* ✅ Police agrandie */
+				text-align: center;
+				font-family: "Tajawal", sans-serif;
+				background-color: #fefefe;
+				box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+				border-radius: 12px;
+				overflow: hidden;
+			}
+
+			.styled-table th,
+			.styled-table td {
+				padding: 4px 1px; /* ✅ Espacement augmenté */
+				border: 1px solid #ddd;
+				background-color: #ffffff;
+				line-height: 1.6; /* ✅ Hauteur de ligne plus grande */
+			}
+
+			.styled-table th {
+				background-color: #3498db;
+				color: white;
+				font-weight: bold;
+				font-size: 19px;
+			}
+
+			.styled-table td {
+				color: #333;
+				font-size: 18px;
+			}
+
+			.styled-table tr:nth-child(even) td {
+				background-color: #f9f9f9;
+			}
+
+			.styled-table td[colspan] {
+				background-color: #ecf0f1;
+			}
+
+			.styled-table .total-row {
+				background-color: #ffeaa7 !important;
+				font-weight: bold;
+				color: #000;
+			}
+
+			.styled-table .average-row {
+				background-color: #81ecec !important;
+				font-weight: bold;
+				color: #000;
+			}
+		</style>
+	</head>
+	<body>
+		<table class="header-table">
+			<tr>
+				<td style="text-align: center;">
+					<div class="header-info">
+						الجمهورية التونسية<br>
+						وزارة التربية<br>
+						المندوبية الجهوية بقبلي
+					</div>
+				</td>
+				<td style="text-align: center;">
+					<div class="header-info">
+						امتحان البكالوريا<br>
+						(دورة جوان 2025)<br>
+						اختبار آخر السنة في مادة التربية البدنية
+					</div>
+				</td>
+				<td style="text-align: center;">
+					<div class="header-info">
+						وزارة الشباب و الرياضة<br>
+						المندوبية الجهوية بقبلي
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" style="text-align: center;">
+					<img src="{{ asset('images/qrcode.png') }}" alt="QR Code" style="height:90px;">
+				</td>
+			</tr>
+		</table>
+
+		<table class="header-table">
+			<tr class="section-footer">
+				<td style="text-align:right">الإختبار:
+					{{ type }}</td>
+				<td style="text-align:left">تاريخ الإختبار:
+					{{classe.lycee.dateEpreuve | date('d-m-Y')}}</td>
+				<td style="text-align:right">القسم:
+					{{ classe.nomclasse }}</td>
+				<td style="text-align:right">المعهد:
+					{{ classe.lycee }}</td>
+
+			</tr>
+		</table>
+{# <p>type = {{ epreuve }}</p> #}
+
+		<div id="table-container">
+			<table class="styled-table">
+				<thead>
+					<tr>
+						<th>العدد</th>
+						{% if epreuve != "12h" and epreuve != "12f" %}
+							<th>أفضل محاولة</th>
+							<th colspan="3">محاولات</th>
+						{% endif %}
+						<th>الاسم و اللقب</th>
+						<th>ع/ر</th>
+					</tr>
+					<tr>
+						<th></th>
+						{% if epreuve != "12h" and epreuve != "12f" %}
+							<th></th>
+							<th>المحاولة 3</th>
+							<th>المحاولة 2</th>
+							<th>المحاولة 1</th>
+						{% endif %}
+						<th></th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for row in eleves %}
+						{% set i = loop.index %}
+						<tr>
+							<td></td>
+							{% if epreuve != "12h" and epreuve != "12f" %}
+								<td></td>
+								<td></td>
+								<td></td>
+								<td></td>
+							{% endif %}
+							<td>{{ row.nomPrenom }}</td>
+							<td>{{ row.cin }}</td>
+						</tr>
+					{% endfor %}
+
+				</tbody>
+			</table>
+		</div>
+		{% block javascripts %}
+			<script>
+				window.onload = function () {
+window.print();
+};
+			</script>
+		{% endblock %}
+	</body>
+</html>

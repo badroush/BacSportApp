@@ -1,0 +1,117 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}المعاهد
+{% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+
+	<style>
+		.disabled-link {
+			pointer-events: none; /* désactive le clic */
+			opacity: 0.6; /* rend le bouton un peu transparent */
+			cursor: not-allowed; /* curseur interdit */
+		}
+	</style>
+{% endblock %}
+{% block body %}
+	<div class="container mt-5">
+
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h3>قائمة المعاهد  👁️
+				</h3>
+				<a href="#" class="btn btn-secondary btn-block me-2 disabled-link" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#">إضافة معهد جديد➕</a>
+			</div>
+		</div>
+		<div class="table-container">
+			<table id="lyceetable" class="table table-striped table-bordered" style="width:100%">
+				<thead>
+					<tr>
+						<th>المعهد</th>
+						<th>نوعه</th>
+						<th>المركز</th>
+						<th>تاريخ الاختبار</th>
+						<th>ساعة الاختبار</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for lycee in lycees %}
+						{% if lycee.type =="pub" %}
+							{% set type = 'عمومي' %}
+						{% else %}
+							{% set type = 'خاص' %}
+						{% endif %}
+						<tr>
+							<td>{{ lycee.nom }}</td>
+							<td>{{ type }}</td>
+							<td>{{ lycee.centre }}</td>
+							<td>{{ lycee.dateEpreuve ? lycee.dateEpreuve|date('d/m/Y') : '' }}</td>
+							<td>{{ lycee.heureEpreuve ? lycee.heureEpreuve|date('H:i') : '' }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+
+			</table>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">إضافة قسم جديد</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="studentForm">
+							<div class="mb-3">
+								<label for="sexe" class="form-label">المعهد</label>
+								<select class="form-select" id="sexe" required>
+									<option selected disabled value="">إختر المعهد...</option>
+									<option value="ذكر">ذكر</option>
+									<option value="أنثى">أنثى</option>
+								</select>
+							</div>
+							<div class="mb-3">
+								<label for="matricule" class="form-label">إسم القسم</label>
+								<input type="text" class="form-control" id="matricule" maxlength="10" required>
+							</div>
+							<div class="d-flex justify-content-end">
+								<button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">إلغاء</button>
+								<button type="submit" class="btn btn-success">حفظ</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('app') }}
+	{{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js "></script>
+	<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.js "></script>
+
+	<script>
+		$(document).ready(function () {
+$('#lyceetable').DataTable({
+language: {
+url: 'build/js/datatable/langAr.json'
+},
+paging: true,
+lengthMenu: [
+10, 25, 50, 100
+],
+searching: true,
+ordering: true,
+autoWidth: false,
+responsive: true
+
+});
+});
+	</script>
+
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}المراكز{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">التصرف في المراكز</h5>
+                <div class="btn-group-header">
+                    <a href="#" class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#addStudentModal">إضافة قسم جديد</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="example" class="table table-striped table-bordered" style="width:100%">
+                <thead>
+                    <tr>
+                        <th>المعهد</th>
+                        <th>القسم</th>
+                        <th>الجنس</th>
+                        <th>الإسم و اللقب</th>
+                        <th>المعرف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {# {% for user in users %}
+                        <tr>
+                            <td>{{ user.nom }}</td>
+                            <td>{{ user.prenom }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.mobile }}</td>
+                            <td>{{ user.inscriptionDate|date('d/m/Y') }}</td>
+                        </tr>
+                    {% endfor %} #}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>اللقب</th>
+                        <th>البريد الإلكتروني</th>
+                        <th>رقم الهاتف</th>
+                        <th>تاريخ التسجيل</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+ <!-- Modal -->
+    <div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">إضافة قسم جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="studentForm">
+                    <div class="mb-3">
+                            <label for="sexe" class="form-label">المعهد</label>
+                            <select class="form-select" id="sexe" required>
+                                <option selected disabled value="">إختر المعهد...</option>
+                                <option value="ذكر">ذكر</option>
+                                <option value="أنثى">أنثى</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="matricule" class="form-label">إسم القسم</label>
+                            <input type="text" class="form-control" id="matricule" maxlength="10" required>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">إلغاء</button>
+                            <button type="submit" class="btn btn-success">حفظ</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+{% endblock %}

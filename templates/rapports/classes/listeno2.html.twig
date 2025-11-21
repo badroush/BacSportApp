@@ -1,0 +1,207 @@
+{% block stylesheets %}
+	<style>
+		.styled-table {
+			width: 100%;
+			border-collapse: separate;
+			border-spacing: 0;
+			font-size: 18px; /* ✅ Police agrandie */
+			text-align: center;
+			font-family: "Tajawal", sans-serif;
+			background-color: #fefefe;
+			box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+			border-radius: 12px;
+			overflow: hidden;
+		}
+
+		.styled-table th,
+		.styled-table td {
+			padding: 4px 1px; /* ✅ Espacement augmenté */
+			border: 1px solid #ddd;
+			background-color: #ffffff;
+			line-height: 1.6; /* ✅ Hauteur de ligne plus grande */
+		}
+
+		.styled-table th {
+			background-color: #3498db;
+			color: white;
+			font-weight: bold;
+			font-size: 19px;
+		}
+
+		.styled-table td {
+			color: #333;
+			font-size: 18px;
+		}
+
+		.styled-table tr:nth-child(even) td {
+			background-color: #f9f9f9;
+		}
+
+		.styled-table td[colspan] {
+			background-color: #ecf0f1;
+		}
+
+		.styled-table .total-row {
+			background-color: #ffeaa7 !important;
+			font-weight: bold;
+			color: #000;
+		}
+
+		.styled-table .average-row {
+			background-color: #81ecec !important;
+			font-weight: bold;
+			color: #000;
+		}
+		.header-table {
+			width: 100%;
+			border: none;
+			text-align: center;
+			font-family: "Tajawal", sans-serif;
+			margin-bottom: 20px;
+			font-size: 18px;
+		}
+		.header-table td {
+			padding: 8px;
+		}
+		.header-info {
+			font-weight: bold;
+			font-size: 19px;
+		}
+		.section-footer {
+			background-color: #ddd;
+			font-weight: bold;
+			padding: 8px;
+			font-size: 17px;
+		}
+	</style>
+
+{% endblock %}
+{% block body %}
+	<table class="header-table">
+		<tr>
+			<td style="text-align: right;">
+				<div class="header-info">
+					الجمهورية التونسية<br>
+					وزارة التربية<br>
+					المندوبية الجهوية بقبلي
+				</div>
+			</td>
+			<td style="text-align: center;">
+				<div class="header-info">
+					امتحان البكالوريا<br>
+					(دورة جوان 2025)<br>
+					اختبار آخر السنة في مادة التربية البدنية
+				</div>
+			</td>
+			<td style="text-align: left;">
+				<div class="header-info">
+					وزارة الشباب و الرياضة<br>
+					المندوبية الجهوية بقبلي
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="3" style="text-align: center;">
+				<img src="{{ asset('img/qrcode.png') }}" alt="QR Code" style="height:90px;">
+				<br>
+				<button style="margin-top:5px; font-size: 16px;">القائمة عدد 2</button>
+			</td>
+		</tr>
+	</table>
+
+	<table class="header-table">
+		<tr class="section-footer">
+			<td style="text-align:left">تاريخ الإختبار:{{classe.lycee.dateEpreuve | date('d-m-Y')}}</td>
+			<td style="text-align:right">القسم:
+				{{ classe.nomclasse }}</td>
+			<td style="text-align:right">المعهد:
+				{{ classe.lycee }}</td>
+			<td style="text-align:right">المركز:{{ classe.lycee.centre }}</td>
+		</tr>
+	</table>
+
+
+	<table class="styled-table">
+		<thead>
+			<tr>
+				<th rowspan="2">المعدل</th>
+				<th rowspan="2">المجموع</th>
+				<th rowspan="2">جمباز</th>
+				<th colspan="2">دفع الجلة</th>
+				<th colspan="2">القفز</th>
+				<th colspan="2">العدو</th>
+				<th rowspan="2">الاسم و اللقب</th>
+				<th rowspan="2">ر.ب.ت</th>
+			</tr>
+			<tr>
+				<th>العدد</th>
+				<th>النتيجة</th>
+				<th>العدد</th>
+				<th>النتيجة</th>
+				<th>العدد</th>
+				<th>النتيجة</th>
+				<th colspan="3"></th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for row in eleves %}
+				<tr>
+					{% if row.dispen=='dispense' %}
+						<td>
+							<span style="color: #e91e63; font-weight: bold;">99.99</span>
+						</td>
+						<td>
+							<span style="color: #e91e63; font-weight: bold;">99.99</span>
+						</td>
+						{% for i in 0..6 %}
+							{% if row.sexe == 'h' %}
+								<td style="background-color:#fce4ec; color:#e91e63; font-weight:bold;">مُعفى</td>
+							{% else %}
+								<td style="background-color:#fce4ec; color:#e91e63; font-weight:bold;">مُعفاة</td>
+							{% endif %}
+						{% endfor %}
+					{% elseif row.dispen=='absent' %}
+						<td>
+							<span style="color: #e91e63; font-weight: bold;">00.00</span>
+						</td>
+						<td>
+							<span style="color: #e91e63; font-weight: bold;">00.00</span>
+						</td>
+						{% for i in 0..6 %}
+							<td style="background-color:#fce4ec; color:#e91e63; font-weight:bold;">غائب</td>
+						{% endfor %}
+					{% elseif row.dispen=='present' %}
+						<td>{{ row.moyenne is defined and row.moyenne is not null ? '%.2f'|format(row.moyenne) : '' }}</td>
+						<td>{{ row.total is defined and row.total is not null ? '%.2f'|format(row.total) : '' }}</td>
+						<td>{{ row.notes[12].note is defined and row.notes[12].note is not null ? '%.2f'|format(row.notes[12].note) : '' }}</td>
+						<td>{{ row.notes[11].note is defined and row.notes[11].note is not null ? '%.2f'|format(row.notes[11].note) : '' }}</td>
+						<td>{{ row.notes[11].coef is defined and row.notes[12].coef is not null ? '%.2f'|format(row.notes[11].coef) : '' }}</td>
+						<td>{{ row.notes[8].note is defined and row.notes[8].note is not null ? '%.2f'|format(row.notes[8].note) : '' }}</td>
+						<td>{{ row.notes[8].coef is defined and row.notes[8].coef is not null ? '%.2f'|format(row.notes[8].coef) : '' }}</td>
+						<td>{{ row.notes[6].note is defined and row.notes[6].note is not null ? '%.2f'|format(row.notes[6].note) : '' }}</td>
+						<td>{{ row.notes[6].coef is defined and row.notes[6].coef is not null ? '%.2f'|format(row.notes[6].coef) : '' }}</td>
+					{% endif %}
+					<td>{{ row.nomPrenom ?? '' }}</td>
+					<td>{{ row.matricule ?? '' }}</td>
+
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="11" style="background-color:#fdecea; color:#e74c3c; font-weight:bold;">لا توجد بيانات</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	<div style="display: flex; justify-content: space-between; margin-top: 40px;">
+		<div>الإمضاء: مدير المؤسسة</div>
+		<div>الإمضاء: أستاذ التربية البدنية</div>
+		<div>الإمضاء: رئيس المركز</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	<script>
+		window.onload = function () {
+window.print();
+};
+	</script>
+{% endblock %}

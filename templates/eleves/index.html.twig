@@ -1,0 +1,297 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}التلاميذ
+{% endblock %}
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.css"/>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+	<style>
+		.action-icon {
+			font-size: 1.5em;
+			color: white;
+			margin: 0 5px;
+			text-decoration: none;
+			display: inline-block;
+			width: 36px;
+			height: 36px;
+			text-align: center;
+			line-height: 36px;
+			border-radius: 6px;
+		}
+
+		.icon-blue {
+			background-color: #17a2b8;
+		}
+
+		/* Info */
+		.icon-green {
+			background-color: #28a745;
+		}
+
+		/* Success */
+		.icon-yellow {
+			background-color: #ffc107;
+		}
+
+		/* Warning */
+		.icon-red {
+			background-color: #dc3545;
+		}
+
+		/* Danger */
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="container mt-5">
+
+
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h3>قائمة التلاميذ 👁️
+				</h3>
+				{% for action in actions %}
+					{% if (is_granted('ROLE_ADMIN') and action.actions == 'add_eleve') or (action.actions == 'add_eleve' and action.active and not action.masque) %}
+						<a href="#" class="btn btn-secondary btn-block me-2" style="border-radius: 10px;" data-bs-toggle="modal" data-bs-target="#addStudentModal">إضافة تلميذ جديد➕</a>
+					{% endif %}
+				{% endfor %}
+			</div>
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h3>إدراج التلاميذ بواسطة ملف Excel 👁️
+				</h3>					
+						<form action="{{ path('eleves_import') }}" method="post" enctype="multipart/form-data">
+    <input type="file" name="excel_file" required accept=".xlsx,.xls" />
+    <button type="submit" class="btn btn-primary mt-2">📥 Importer Fichier Excel</button>
+</form>
+			</div>
+		</div>
+
+		<div
+			class="table-container">
+				<table id="elevesTable" class="table table-striped table-bordered" style="width:100%">
+				<thead>
+					<tr>
+						<th style="text-align: center;">المعرف</th>
+						<th style="text-align: center;">ر.ب.ت</th>
+						<th style="text-align: center;">الإسم و اللقب</th>
+						<th style="text-align: center;">الجنس</th>
+						<th style="text-align: center;">القسم</th>
+						<th style="text-align: center;">المعهد</th>
+						<th style="text-align: center;">إجراءات</th>
+
+					</tr>
+				</thead>
+			</table>
+
+		</div>
+
+		<!-- Modal -->
+		<div class="modal fade" id="addStudentModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">إضافة تلميذ جديد</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						{{ form_start(form) }}
+						<div class="mb-3">
+							{{ form_widget(form.matricule, {'attr': {'class': 'form-control', 'maxlength': '10','placeholder': 'رقم بطاقة التعريف', 'dir': 'rtl'}})
+													}}
+						</div>
+						<div class="mb-3">
+							{{ form_widget(form.nomPrenom, {'attr': {'class': 'form-control', 'placeholder': 'الاسم و اللقب', 'dir': 'rtl'}})
+													}}
+						</div>
+						<div class="mb-3">
+							{{ form_widget(form.sexe, {'attr': {'class': 'form-select' ,'placeholder': 'الجنس', 'dir': 'rtl'}})}}
+						</div>
+						<div class="mb-3">
+							{{ form_widget(form.lycee, {'attr': {'class': 'form-select','placeholder': 'المعهد', 'dir': 'rtl'}})}}
+						</div>
+						<div class="mb-3">
+							{{ form_widget(form.classe, {'attr': {'class': 'form-select','placeholder': 'القسم', 'dir': 'rtl'}})}}
+						</div>
+						<div class="mb-3">
+							{{ form_widget(form.cin, {'attr': {'class': 'form-control', 'maxlength': '10', 'enabled': 'false', 'readonly': 'true', 'placeholder': 'المعرف','disabled': 'true', 'dir': 'rtl'}})}}
+						</div>
+						<div class="text-end">
+							<button type="submit" class="btn btn-success btn-block">💾 تسجيل</button>
+						</div>
+						{{ form_end(form) }}
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Preloader (ex : un spinner Bootstrap) -->
+		<div id="preloader" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.7); z-index:9999;">
+			<div class="d-flex justify-content-center align-items-center h-100">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Chargement...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascripts %}
+	{{ encore_entry_script_tags('app') }}
+	{{ parent() }}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js "></script>
+	<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.6/b-2.4.2/b-html5-2.4.2/datatables.min.js "></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+	<script>
+		$(document).ready(function () {
+$('#elevesTable').DataTable({
+processing: true,
+serverSide: true,
+ajax: "{{ path('api_eleves_data') }}",
+language: {
+url: "{{ asset('build/js/datatable/langAr.json') }}"
+},
+columns: [
+{
+data: 'cin',
+className: 'text-end'
+},
+{
+data: 'matricule',
+className: 'text-end'
+},
+{
+data: 'nomprenom',
+className: 'text-end'
+},
+{
+data: 'sexe',
+className: 'text-end'
+}, {
+data: 'classe',
+className: 'text-end'
+}, {
+data: 'lycee',
+className: 'text-end'
+}, {
+data: 'actions',
+orderable: false,
+searchable: false,
+className: 'text-end'
+}
+],
+order: [
+[0, 'asc']
+],
+createdRow: function (row, data, dataIndex) { // S’assurer que le HTML est bien interprété (ex: pour les boutons dans 'actions')
+$(row).find('td').each(function () {
+$(this).html($(this).html());
+});
+}
+});
+// Activation du SweetAlert pour suppression
+$(document).on('click', '.delete-class', function (e) {
+e.preventDefault();
+const preloader = document.getElementById('preloader');
+console.log("preloader", preloader);
+const href = $(this).attr('href');
+Swal.fire({
+title: 'تاكيد الحذف ?',
+icon: 'warning',
+showCancelButton: true,
+confirmButtonColor: '#d33',
+cancelButtonColor: '#3085d6',
+confirmButtonText: 'نعم, إحذف',
+cancelButtonText: 'إلغاء'
+}).then((result) => {
+if (result.isConfirmed === true) {
+if (preloader) 
+preloader.style.display = 'block';
+
+window.location.href = href;
+}
+});
+});
+});
+	</script>
+
+	<script>
+		// Gestion de l'envoi du formulaire
+$('#studentForm').submit(function (e) {
+e.preventDefault();
+alert("تم حفظ التلميذ بنجاح !");
+$('#addStudentModal').modal('hide');
+$('#studentForm')[0].reset();
+});
+	</script>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+const lyceeSelect = document.querySelector('#eleve_type_form_lycee');
+const classeSelect = document.querySelector('#eleve_type_form_classe');
+lyceeSelect.addEventListener('change', function () {
+const lyceeId = this.value;
+// Réinitialiser
+classeSelect.innerHTML = '<option value="">جار التحميل...</option>';
+classeSelect.disabled = true;
+});
+});
+	</script>
+	<script>
+		function updateClasseOptions(lyceeId, selectedClasseId = null) {
+const classeSelect = document.getElementById('eleve_type_form_classe');
+if (! classeSelect) 
+return;
+
+if (! lyceeId) {
+classeSelect.innerHTML = '<option>اختر القسم</option>';
+classeSelect.disabled = false;
+return;
+}
+classeSelect.innerHTML = '<option>جار التحميل...</option>';
+classeSelect.disabled = false;
+fetch (`/api/classe/${lyceeId}`).then(response => response.json()).then(data => {
+classeSelect.innerHTML = '<option value="">اختر القسم</option>';
+data.forEach(classe => {
+const option = document.createElement('option');
+option.value = classe.id;
+option.textContent = classe.nom + ' ' + classe.num; // ✅ Utilise la chaîne
+if (selectedClasseId && classe.id == selectedClasseId) {
+option.selected = true;
+}
+classeSelect.appendChild(option);
+});
+classeSelect.disabled = false;
+}).catch(() => {
+classeSelect.innerHTML = '<option>خطأ في التحميل</option>';
+});
+}
+document.addEventListener('DOMContentLoaded', function () {
+const lyceeSelect = document.getElementById('eleve_type_form_lycee');
+const selectedClasseId = document.getElementById('eleve_type_form_classe') ?.dataset ?.selected;
+if (lyceeSelect) { // Initialisation : charger les classes si lycée pré-sélectionné
+if (lyceeSelect.value) {
+updateClasseOptions(lyceeSelect.value, selectedClasseId);
+} else {
+document.getElementById('eleve_type_form_classe').disabled = false;
+} lyceeSelect.addEventListener('change', function () {
+updateClasseOptions(this.value);
+});
+}
+});
+	</script>
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+const form = document.querySelector('form[name="      {{ form.vars.name }}"]');
+const preloader = document.getElementById('preloader');
+if (form && preloader) {
+form.addEventListener('submit', function () {
+preloader.style.display = 'block';
+});
+}
+});
+	</script>
+
+{% endblock %}

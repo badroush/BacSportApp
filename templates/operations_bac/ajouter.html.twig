@@ -1,0 +1,8 @@
+<h2>Ajouter une opération pour {{ eleve.nomPrenom }}</h2>
+
+{{ form_start(form) }}
+    {{ form_row(form.epreuve) }}
+    {{ form_row(form.resultat) }}
+    {{ form_widget(form.par) }}
+    <button class="btn btn-success">Enregistrer</button>
+{{ form_end(form) }}

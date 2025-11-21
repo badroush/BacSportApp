@@ -1,0 +1,33 @@
+{
+  "name": "bsportapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "dev": "encore dev",
+    "watch": "encore dev --watch",
+    "dev-server": "webpack serve --config webpack.config.dev-server.js",
+    "build": "encore production"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@symfony/webpack-encore": "^5.1.0",
+    "bootstrap": "^5.3.6",
+    "file-loader": "^6.0.0",
+    "install": "^0.13.0",
+    "webpack": "^5.99.9",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.2.1"
+  },
+  "dependencies": {
+    "bootstrap-icons": "^1.13.1",
+    "core-js": "^3.42.0",
+    "inputmask": "^5.0.9",
+    "sweetalert2": "^11.21.2"
+  }
+}
